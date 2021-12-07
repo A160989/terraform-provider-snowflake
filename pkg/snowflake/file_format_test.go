@@ -58,6 +58,63 @@ func TestFileFormatCreateJSON(t *testing.T) {
 	r.Equal(`CREATE FILE FORMAT "test_db"."test_schema"."test_file_format_json" TYPE = 'JSON' COMPRESSION = 'AUTO' DATE_FORMAT = 'AUTO' TIME_FORMAT = 'AUTO' TIMESTAMP_FORMAT = 'AUTO' BINARY_FORMAT = 'HEX' NULL_IF = ('\n', 'NULL') TRIM_SPACE = true ENABLE_OCTAL = false ALLOW_DUPLICATE = false STRIP_OUTER_ARRAY = false STRIP_NULL_VALUES = false REPLACE_INVALID_CHARACTERS = false IGNORE_UTF8_ERRORS = true SKIP_BYTE_ORDER_MARK = false`, f.Create())
 }
 
+func TestFileFormatCreateAvro(t *testing.T) {
+	r := require.New(t)
+	f := FileFormat("test_file_format_avro", "test_db", "test_schema")
+	r.Equal(f.QualifiedName(), `"test_db"."test_schema"."test_file_format_avro"`)
+
+	f.WithFormatType("AVRO")
+	f.WithCompression("AUTO")
+	f.WithTrimSpace(false)
+	f.WithNullIf([]string{"\\n", "NULL"})
+
+	r.Equal(`CREATE FILE FORMAT "test_db"."test_schema"."test_file_format_avro" TYPE = 'AVRO' COMPRESSION = 'AUTO' NULL_IF = ('\n', 'NULL') TRIM_SPACE = false`, f.Create())
+}
+
+func TestFileFormatCreateORC(t *testing.T) {
+	r := require.New(t)
+	f := FileFormat("test_file_format_orc", "test_db", "test_schema")
+	r.Equal(f.QualifiedName(), `"test_db"."test_schema"."test_file_format_orc"`)
+
+	f.WithFormatType("ORC")
+	f.WithTrimSpace(false)
+	f.WithNullIf([]string{"\\n", "NULL"})
+
+	r.Equal(`CREATE FILE FORMAT "test_db"."test_schema"."test_file_format_orc" TYPE = 'ORC' NULL_IF = ('\n', 'NULL') TRIM_SPACE = false`, f.Create())
+}
+
+func TestFileFormatCreateParquet(t *testing.T) {
+	r := require.New(t)
+	f := FileFormat("test_file_format_parquet", "test_db", "test_schema")
+	r.Equal(f.QualifiedName(), `"test_db"."test_schema"."test_file_format_parquet"`)
+
+	f.WithFormatType("PARQUET")
+	f.WithCompression("AUTO")
+	f.WithBinaryAsText(true)
+	f.WithTrimSpace(false)
+	f.WithNullIf([]string{"\\n", "NULL"})
+
+	r.Equal(`CREATE FILE FORMAT "test_db"."test_schema"."test_file_format_parquet" TYPE = 'PARQUET' COMPRESSION = 'AUTO' NULL_IF = ('\n', 'NULL') BINARY_AS_TEXT = true TRIM_SPACE = false`, f.Create())
+
+}
+
+func TestFileFormatCreateXML(t *testing.T) {
+	r := require.New(t)
+	f := FileFormat("test_file_format_xml", "test_db", "test_schema")
+	r.Equal(f.QualifiedName(), `"test_db"."test_schema"."test_file_format_xml"`)
+
+	f.WithFormatType("XML")
+	f.WithCompression("AUTO")
+	f.WithIgnoreUTF8Errors(false)
+	f.WithPreserveSpace(false)
+	f.WithStripOuterElement(false)
+	f.WithDisableSnowflakeData(false)
+	f.WithDisableAutoConvert(false)
+	f.WithSkipByteOrderMark(true)
+
+	r.Equal(`CREATE FILE FORMAT "test_db"."test_schema"."test_file_format_xml" TYPE = 'XML' COMPRESSION = 'AUTO' IGNORE_UTF8_ERRORS = false PRESERVE_SPACE = false STRIP_OUTER_ELEMENT = false DISABLE_SNOWFLAKE_DATA = false DISABLE_AUTO_CONVERT = false SKIP_BYTE_ORDER_MARK = true`, f.Create())
+}
+
 func TestFileFormatChangeComment(t *testing.T) {
 	r := require.New(t)
 	f := FileFormat("test_file_format", "test_db", "test_schema")
